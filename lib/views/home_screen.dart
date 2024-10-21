@@ -168,60 +168,61 @@ class PollItem extends StatelessWidget {
             const SizedBox(height: 8),
             SizedBox(
               width: MediaQuery.of(context).size.width * 0.7,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  if (isLogin)
-                    Text(
-                        FirebaseAuth.instance.currentUser!.uid == poll.createdBy
-                            ? "Created by You"
-                            : "Created by other user"),
-                  Text('Total Votes: ${poll.getTotalVotes()}',
-                      style: Theme.of(context).textTheme.displaySmall),
-                  if (isLogin &&
-                      FirebaseAuth.instance.currentUser!.uid == poll.createdBy)
-                    IconButton(
-                        onPressed: onShare,
-                        icon: const Icon(Icons.share_sharp, color: Colors.blue))
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.7,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        // shape: const CircleBorder(),
-                        backgroundColor: Colors.blue,
-                        // padding:
-                        //     const EdgeInsets.symmetric(horizontal: 16),
-                      ),
-                      onPressed: () {
-                        selectedOption != ""
-                            ? onVote(selectedOption)
-                            : ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    backgroundColor: Colors.white70,
-                                    content: Text(
-                                        "Please choose option to vote",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .displaySmall!
-                                            .copyWith(color: Colors.red))));
-                      },
-                      child: Text("Vote",
-                          style: Theme.of(context).textTheme.displayMedium)),
-                  IconButton(
+              child: ListTile(
+                  leading: IconButton(
                       onPressed: () {
                         onRefresh();
                       },
                       icon: const Icon(Icons.refresh_outlined,
-                          size: 30, color: Colors.blue))
-                ],
-              ),
+                          size: 30, color: Colors.blue)),
+                  title: Text('Total Votes: ${poll.getTotalVotes()}',
+                      style: Theme.of(context).textTheme.displaySmall!.copyWith(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400
+                          )),
+                  subtitle: isLogin == true
+                      ? Text(
+                          FirebaseAuth.instance.currentUser!.uid ==
+                                  poll.createdBy
+                              ? "Created by You"
+                              : "Created by other user",
+                          style: Theme.of(context).textTheme.displaySmall!.copyWith(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600
+                          ))
+                      : null,
+                  trailing: isLogin &&
+                          FirebaseAuth.instance.currentUser!.uid ==
+                              poll.createdBy
+                      ? IconButton(
+                          onPressed: onShare,
+                          icon:
+                              const Icon(Icons.share_sharp, color: Colors.blue))
+                      : null),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.7,
+              child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    // shape: const CircleBorder(),
+                    backgroundColor: Colors.blue,
+                    // padding:
+                    //     const EdgeInsets.symmetric(horizontal: 16),
+                  ),
+                  onPressed: () {
+                    selectedOption != ""
+                        ? onVote(selectedOption)
+                        : ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            backgroundColor: Colors.white70,
+                            content: Text("Please choose option to vote",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displaySmall!
+                                    .copyWith(color: Colors.red))));
+                  },
+                  child: Text("Vote",
+                      style: Theme.of(context).textTheme.displayMedium)),
             ),
           ],
         ),
