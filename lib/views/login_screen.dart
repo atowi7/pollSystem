@@ -90,7 +90,7 @@ class LoginScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushReplacementNamed(context, AppRoutes.signup);
                   },
-                  child: Text("Already have an account? SignUp",
+                  child: Text("Don't have an account? SignUp",
                       style: Theme.of(context).textTheme.displaySmall))
             ],
           ),
