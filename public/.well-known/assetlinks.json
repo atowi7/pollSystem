@@ -1,0 +1,14 @@
+[
+    {
+      "relation": [
+        "delegate_permission/common.handle_all_urls"
+      ],
+      "target": {
+      "namespace": "android_app",
+      "package_name": "com.atowi7.poll_system",
+      "sha256_cert_fingerprints": [
+          "BE:BF:0A:EA:14:85:5F:BB:92:45:03:7A:32:36:44:A8:1E:E9:A4:CF:89:FA:2D:31:2A:ED:BC:ED:0A:22:93:6A"    
+        ]
+      }
+    }
+  ]

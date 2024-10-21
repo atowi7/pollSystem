@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "123068805969",
+    "project_id": "poll-system-23e47",
+    "storage_bucket": "poll-system-23e47.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123068805969:android:9158a7d8277a49e43ad970",
+        "android_client_info": {
+          "package_name": "com.atowi7.poll_system"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdsEBWMai3RmMBU22Di34EFUdraSd1YLs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

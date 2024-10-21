@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Poll System</title>
+
+    <!-- Firebase SDKs -->
+    <script defer src="/__/firebase/10.14.1/firebase-app-compat.js"></script>
+    <script defer src="/__/firebase/10.14.1/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+
+    <style>
+      body { background: #ECEFF1; font-family: Roboto, Arial, sans-serif; margin: 0; padding: 0; }
+      #message { background: white; max-width: 360px; margin: 100px auto; padding: 32px; border-radius: 3px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <div id="message">
+      <h1>App Not Installed</h1>
+      <p>Please download our app from one of the stores below:</p>
+      <button onclick="openPlayStore()">Open Google Play Store</button>
+      <button onclick="openAppStore()">Open Apple App Store</button>
+  </div>
+
+  <script>
+    function openPlayStore() {
+        window.location.href = 'https://play.google.com/store/apps/details?id=com.atowi7.poll_system';
+    }
+
+    function openAppStore() {
+        window.location.href = 'https://apps.apple.com/app/com.atowi7.pollSystem';
+    }
+</script>
+  </body>
+</html>
