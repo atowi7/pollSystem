@@ -3,23 +3,23 @@
 The **Poll System App** is a Flutter-based polling system that allows users to create, vote, and view polls. It integrates with Firebase services for authentication and database management, ensuring seamless interaction with the backend. This project demonstrates the use of `FirebaseAuth`, `Firestore`, deep linking, and QR code generation within a Flutter app.
 
 ![poll signup](images/pollSystemSignupScreen.png)
-![poll signup](images/pollSystemLoginScreen.png)
-![poll signup](images/pollSystemHomeScreen.png)
+![poll signup](images/pollSystemLoginScreen.png)<br><br>
+![poll signup](images/pollSygit clone https://github.com/google/boringssl.git
+stemHomeScreen.png)
 ![poll signup](images/pollSystemCreateScreen.png)
 
 ## Table of Contents
 
 1. [Features](#features)
 2. [Technologies](#technologies)
-3. [Installation](#installation)
-4. [Usage](#usage)
+3. [Usage](#usage)
    - [Creating Polls](#creating-polls)
    - [Fetching Polls](#fetching-polls)
    - [Submitting Responses](#submitting-responses)
    - [Deep Linking](#deep-linking)
    - [QR Code Sharing](#qr-code-sharing)
    - [User Authentication](#user-authentication)
-5. [File Structure](#file-structure)
+4. [File Structure](#file-structure)
 
 ---
 
@@ -41,46 +41,6 @@ The **Poll System App** is a Flutter-based polling system that allows users to c
 - **Provider** (State Management)
 - **Deep Linking** (App Links)
 - **QR Code Generation** (QR Flutter package)
-
-## Installation
-
-### Prerequisites
-
-- Flutter installed on your local machine.
-- Firebase project set up for Firestore and Authentication.
-- Android Studio, Xcode, or VSCode for development.
-
-### Steps
-
-1. Clone this repository:
-
-    ```bash
-    git clone https://github.com/your-username/poll-system-app.git
-    ```
-
-2. Navigate to the project directory:
-
-    ```bash
-    cd poll-system-app
-    ```
-
-3. Install dependencies:
-
-    ```bash
-    flutter pub get
-    ```
-
-4. Configure Firebase:
-
-   - Create a Firebase project.
-   - Enable Firestore and Authentication in Firebase.
-   - Download `google-services.json` (for Android) and `GoogleService-Info.plist` (for iOS) and place them in the respective folders (`android/app` and `ios/Runner`).
-
-5. Run the app:
-
-    ```bash
-    flutter run
-    ```
     
 ## Usage
 
@@ -89,7 +49,7 @@ The **Poll System App** is a Flutter-based polling system that allows users to c
 The app allows authenticated users to create polls with a set of options.
 
 ```dart
-Future<bool> createPoll(String question, List<String> options);
+Future<bool> createPoll(PollModel poll);
 ```
 
 ### Fetching Polls
@@ -118,7 +78,7 @@ Future<void> _initDeepLinking();
 
 ### QR Code Sharing
 
-Poll links can be shared via QR codes, allowing users to scan the code and open the poll.
+Poll links can be shared via QR codes, allowing users to scan the code and open the app.
 
 ```dart
 void showQrCodeDialog(BuildContext context, String link);
@@ -149,20 +109,20 @@ Future<void> logout();
 ```bash
 ├── lib
 │   ├── models
-│   │   ├── poll_model.dart         # Poll data model
-│   │   ├── user_model.dart         # User data model
+│   │   ├── poll_model.dart         
+│   │   ├── user_model.dart        
 │   ├── providers
-│   │   ├── poll_provider.dart      # Poll-related state management
-│   │   ├── user_provider.dart      # User-related state management
+│   │   ├── poll_provider.dart     
+│   │   ├── user_provider.dart     
 │   ├── services
-│   │   ├── poll_service.dart       # Firestore operations for polls
-│   │   ├── user_service.dart       # Firebase Authentication operations
+│   │   ├── poll_service.dart      
+│   │   ├── user_service.dart       
 │   ├── views
-│   │   ├── create_poll_screen.dart # Firestore operations for polls
-│   │   ├── home_screen.dart        # Firestore operations for polls
-│   │   ├── login_screen.dart       # Firebase Authentication operations
-│   │   ├── signup_screen.dart      # Firebase Authentication operations
-│   ├── app_routes.dart             # App navigation routes
-│   └── main.dart                   # App entry point
+│   │   ├── create_poll_screen.dart 
+│   │   ├── home_screen.dart       
+│   │   ├── login_screen.dart      
+│   │   ├── signup_screen.dart      
+│   ├── app_routes.dart            
+│   └── main.dart                   
 └── pubspec.yaml
 ```
