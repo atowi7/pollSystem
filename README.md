@@ -4,8 +4,7 @@ The **Poll System App** is a Flutter-based polling system that allows users to c
 
 ![poll signup](images/pollSystemSignupScreen.png)
 ![poll signup](images/pollSystemLoginScreen.png)<br><br>
-![poll signup](images/pollSygit clone https://github.com/google/boringssl.git
-stemHomeScreen.png)
+![poll signup](images/pollSystemHomeScreen.png)
 ![poll signup](images/pollSystemCreateScreen.png)
 
 ## Table of Contents
@@ -38,6 +37,7 @@ stemHomeScreen.png)
 - **Flutter** (Frontend)
 - **Firebase Firestore** (Backend Database)
 - **Firebase Authentication** (User Authentication)
+- **Firebase Hosting** (Url link to open the app)
 - **Provider** (State Management)
 - **Deep Linking** (App Links)
 - **QR Code Generation** (QR Flutter package)
