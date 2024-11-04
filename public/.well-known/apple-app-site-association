@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "12345.com.atowi7.pollSystem",
+        "paths": ["*"]
+      }
+    ]
+  }
+}

@@ -10,21 +10,23 @@ class PollService {
   }
 
   Future<PollModel> getPollById(String id) async {
-    var snapshot = await pollCollection.doc(id).get();
-    return PollModel.fromSnapshot(snapshot);
+    var doc = await pollCollection.doc(id).get();
+    return PollModel.fromDocument(doc);
   }
 
-  Future<List<PollModel>> getAllPolls() async {
-    QuerySnapshot snapshot = await pollCollection.get();
-    return snapshot.docs.map((doc) => PollModel.fromSnapshot(doc)).toList();
+  Stream<List<PollModel>> getAllPollsStream() {
+    return pollCollection.snapshots().map((snapshot) =>
+        snapshot.docs.map((doc) => PollModel.fromDocument(doc)).toList());
+    // QuerySnapshot snapshot = await pollCollection.get();
+    // return snapshot.docs.map((doc) => PollModel.fromSnapshot(doc)).toList();
   }
 
   Future<void> submitResponse(String pollId, String option) async {
     var pollRef = pollCollection.doc(pollId);
 
     FirebaseFirestore.instance.runTransaction((trunsaction) async {
-      var snapshot = await trunsaction.get(pollRef);
-      PollModel poll = PollModel.fromSnapshot(snapshot);
+      var doc = await trunsaction.get(pollRef);
+      PollModel poll = PollModel.fromDocument(doc);
 
       poll.responses[option] = (poll.responses[option] ?? 0) + 1;
       trunsaction.update(pollRef, {'responses': poll.responses});

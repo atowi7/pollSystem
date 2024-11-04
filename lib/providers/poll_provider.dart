@@ -4,75 +4,116 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:poll_system/app_routes.dart';
-import 'package:poll_system/main.dart';
 import 'package:poll_system/models/poll_model.dart';
 import 'package:poll_system/services/poll_service.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:app_links/app_links.dart';
 
 class PollProvider extends ChangeNotifier {
   final PollService _pollService = PollService();
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _questionController = TextEditingController();
+  final List<TextEditingController> _optionsController = [
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController(),
+  ];
+
   PollModel? _poll;
   bool _isLoading = false;
-  String _selectedOption = "";
+  // String _selectedOption = "";
+  Map<String, String> selectedOptions = {};
 
+  GlobalKey<FormState> get formKey => _formKey;
+  TextEditingController get questionController => _questionController;
+  List<TextEditingController> get optionsController => _optionsController;
   PollModel? get poll => _poll;
   bool get isLoading => _isLoading;
-  String? get selectedOption => _selectedOption;
+  // String? get selectedOption => _selectedOption;
 
   late StreamSubscription? _sub;
 
-  PollProvider() {
-    _initDeepLiniking();
-  }
-  Future<void> _initDeepLiniking() async {
-    final appLinks = AppLinks();
-    final initialUrl = await appLinks.getInitialLink();
-    if (initialUrl != null) {
-      _handleDeepLinking(initialUrl);
+  // PollProvider() {
+  //   _initDeepLiniking();
+  // }
+  // Future<void> _initDeepLiniking() async {
+  //   final appLinks = AppLinks();
+  //   final initialUrl = await appLinks.getInitialLink();
+  //   if (initialUrl != null) {
+  //     _handleDeepLinking(initialUrl);
+  //   }
+
+  //   _sub = appLinks.uriLinkStream.listen((Uri? uri) {
+  //     if (uri != null) {
+  //       _handleDeepLinking(uri);
+  //     }
+  //   }, onError: (error) {
+  //     SnackBar(content: Text('Failed to reciece link : $error'));
+  //   });
+  // }
+
+  // void _handleDeepLinking(Uri uri) async {
+  //   final pollId = uri.queryParameters['pollId'];
+  //   if (pollId != null) {
+  //     Navigator.of(navigatorKey.currentContext!).pushNamedAndRemoveUntil(
+  //         AppRoutes.home, (Route<dynamic> route) => false);
+  //   }
+  // }
+
+  String? validateQuestion(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter a question';
     }
-
-    _sub = appLinks.uriLinkStream.listen((Uri? uri) {
-      if (uri != null) {
-        _handleDeepLinking(uri);
-      }
-    }, onError: (error) {
-      SnackBar(content: Text('Failed to reciece link : $error'));
-    });
+    return null;
   }
 
-  void _handleDeepLinking(Uri uri) async {
-    final pollId = uri.queryParameters['pollId'];
-    if (pollId != null) {
-      Navigator.of(navigatorKey.currentContext!).pushNamedAndRemoveUntil(
-          AppRoutes.home, (Route<dynamic> route) => false);
+  String? validateOption(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter an option';
     }
+    return null;
   }
 
-  Future<bool> createPoll(String question, List<String> options) async {
-    _isLoading = true;
-    notifyListeners();
-
-    String pollId = FirebaseFirestore.instance.collection('polls').doc().id;
-    User? user = FirebaseAuth.instance.currentUser;
-
-    try {
-      PollModel newPoll = PollModel(
-        id: pollId,
-        question: question,
-        options: options,
-        responses: {},
-        createdBy: user!.uid,
-      );
-      await _pollService.createPoll(newPoll);
-
-      _isLoading = false;
-
+  Future<void> createPoll(BuildContext context) async {
+    if (_formKey.currentState!.validate()) {
+      String question = _questionController.text;
+      List<String> options =
+          _optionsController.map((controller) => controller.text).toList();
+      _isLoading = true;
       notifyListeners();
 
-      return true;
-    } on FirebaseFirestore catch (_) {
-      return false;
+      String pollId = FirebaseFirestore.instance.collection('polls').doc().id;
+      User? user = FirebaseAuth.instance.currentUser;
+
+      try {
+        PollModel newPoll = PollModel(
+          id: pollId,
+          question: question,
+          options: options,
+          responses: {},
+          createdBy: user!.uid,
+        );
+        await _pollService.createPoll(newPoll);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              backgroundColor: Colors.lightGreen,
+              duration: Duration(seconds: 1),
+              content: Text(
+                'Poll created sucessfully',
+              )));
+          Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+        }
+
+        _isLoading = false;
+
+        notifyListeners();
+      } on FirebaseFirestore catch (_) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 1),
+              content: Text('Error : Failed to create poll')));
+        }
+      }
     }
   }
 
@@ -86,8 +127,8 @@ class PollProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateSelectedOption(String option) {
-    _selectedOption = option;
+  void updateSelectedOption(String pollId, String option) {
+    selectedOptions[pollId] = option;
     notifyListeners();
   }
 
@@ -108,13 +149,11 @@ class PollProvider extends ChangeNotifier {
   Future<void> submitResponse(String pollId, String option) async {
     await _pollService.submitResponse(pollId, option);
 
-    _selectedOption = "";
-
     notifyListeners();
   }
 
-  Future<List<PollModel>> getAllPolls() async {
-    return await _pollService.getAllPolls();
+  Stream<List<PollModel>> getAllPollsStream() {
+    return _pollService.getAllPollsStream();
   }
 
   // Future<int> getTotalVotes(String pollId) async {
@@ -172,11 +211,11 @@ class PollProvider extends ChangeNotifier {
         });
   }
 
-  void refresh() async {
-    await getAllPolls();
+  // void refresh() async {
+  //   await getAllPolls();
 
-    notifyListeners();
-  }
+  //   notifyListeners();
+  // }
 
   @override
   void dispose() {

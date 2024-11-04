@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:poll_system/app_routes.dart';
@@ -16,7 +18,7 @@ class HomeScreen extends StatelessWidget {
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blue[100],
         appBar: AppBar(
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -39,8 +41,8 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
         ),
-        body: FutureBuilder(
-            future: pollProvider.getAllPolls(),
+        body: StreamBuilder<List<PollModel>>(
+            stream: pollProvider.getAllPollsStream(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -61,18 +63,19 @@ class HomeScreen extends StatelessWidget {
                     PollModel poll = polls[index];
                     return PollItem(
                       poll: poll,
-                      selectedOption: pollProvider.selectedOption!,
+                      selectedOption:
+                          pollProvider.selectedOptions[poll.id] ?? "",
                       isLogin: userProvider.checkUserAuth(),
-                      updateSelectedOption: (option) =>
-                          pollProvider.updateSelectedOption(option),
+                      onChanged: (option) =>
+                          pollProvider.updateSelectedOption(poll.id, option),
                       onVote: (option) =>
                           pollProvider.submitResponse(poll.id, option),
                       onShare: () async {
-                        pollProvider.showQrCodeDialog(context,
-                            'https://poll-system-23e47.web.app?pollId=${poll.id}');
-                      },
-                      onRefresh: () {
-                        pollProvider.refresh();
+                        pollProvider.showQrCodeDialog(
+                            context,
+                            Platform.isIOS
+                                ? 'app://polls/${poll.id}'
+                                : 'https://poll-system-23e47.web.app?pollId=${poll.id}');
                       },
                     );
                   });
@@ -84,11 +87,14 @@ class HomeScreen extends StatelessWidget {
             } else {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   backgroundColor: Colors.white70,
+                  duration: const Duration(seconds: 1),
                   content: Text('You should have an account to create poll',
                       style: Theme.of(context).textTheme.displaySmall!.copyWith(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
                             color: Colors.red,
                           ))));
-              Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+              Navigator.of(context).pushNamed(AppRoutes.login);
             }
           },
           child: const Icon(Icons.add_outlined),
@@ -103,25 +109,24 @@ class PollItem extends StatelessWidget {
   final String selectedOption;
   final bool isLogin;
   final Function(String) onVote;
-  final Function(String) updateSelectedOption;
+  final Function(String) onChanged;
   final Function() onShare;
-  final Function() onRefresh;
+  // final Function() onRefresh;
   const PollItem({
     super.key,
     required this.poll,
     required this.selectedOption,
     required this.isLogin,
-    required this.updateSelectedOption,
+    required this.onChanged,
     required this.onVote,
     required this.onShare,
-    required this.onRefresh,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.all(8),
-      color: const Color.fromARGB(255, 137, 176, 193),
+      color: Colors.blue[200],
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: Column(
@@ -139,21 +144,21 @@ class PollItem extends StatelessWidget {
                   LinearProgressIndicator(
                     minHeight: 20,
                     value: percentage,
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      Color.fromARGB(255, 84, 113, 128),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Colors.blue[400]!,
                     ),
                   ),
                   ListTile(
                     leading: Radio<String>(
                       activeColor: selectedOption == option
-                          ? Colors.blue[900]
+                          ? Colors.blue[800]
                           : Colors.blue[600],
                       // hoverColor: Colors.blueAccent,
                       value: option,
                       groupValue: selectedOption,
                       onChanged: (value) {
                         if (value != null) {
-                          updateSelectedOption(value);
+                          onChanged(value);
                         }
                       },
                     ),
@@ -167,63 +172,66 @@ class PollItem extends StatelessWidget {
             }),
             const SizedBox(height: 8),
             SizedBox(
-              width: MediaQuery.of(context).size.width * 0.7,
+              width: MediaQuery.of(context).size.width * 0.9,
               child: ListTile(
-                  leading: IconButton(
+                  leading: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        // shape: const CircleBorder(),
+                        backgroundColor: Colors.blue,
+                        // padding:
+                        //     const EdgeInsets.symmetric(horizontal: 16),
+                      ),
                       onPressed: () {
-                        onRefresh();
+                        selectedOption != ""
+                            ? onVote(selectedOption)
+                            : ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    backgroundColor: Colors.white70,
+                                    duration: const Duration(seconds: 1),
+                                    content: Text(
+                                        "Please choose option to vote",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displaySmall!
+                                            .copyWith(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.red))));
                       },
-                      icon: const Icon(Icons.refresh_outlined,
-                          size: 30, color: Colors.blue)),
+                      child: Text("Vote",
+                          style: Theme.of(context)
+                              .textTheme
+                              .displaySmall!
+                              .copyWith(fontWeight: FontWeight.w800))),
                   title: Text('Total Votes: ${poll.getTotalVotes()}',
-                      style: Theme.of(context).textTheme.displaySmall!.copyWith(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400
-                          )),
+                      style: Theme.of(context)
+                          .textTheme
+                          .displaySmall!
+                          .copyWith(fontWeight: FontWeight.w400)),
                   subtitle: isLogin == true
                       ? Text(
                           FirebaseAuth.instance.currentUser!.uid ==
                                   poll.createdBy
                               ? "Created by You"
                               : "Created by other user",
-                          style: Theme.of(context).textTheme.displaySmall!.copyWith(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600
-                          ))
+                          style: Theme.of(context)
+                              .textTheme
+                              .displaySmall!
+                              .copyWith(fontWeight: FontWeight.w600))
                       : null,
                   trailing: isLogin &&
                           FirebaseAuth.instance.currentUser!.uid ==
                               poll.createdBy
                       ? IconButton(
                           onPressed: onShare,
-                          icon:
-                              const Icon(Icons.share_sharp, color: Colors.blue))
+                          icon: const Icon(
+                            Icons.share_rounded,
+                            color: Colors.blue,
+                            size: 30,
+                          ))
                       : null),
             ),
             const SizedBox(height: 8),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.7,
-              child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    // shape: const CircleBorder(),
-                    backgroundColor: Colors.blue,
-                    // padding:
-                    //     const EdgeInsets.symmetric(horizontal: 16),
-                  ),
-                  onPressed: () {
-                    selectedOption != ""
-                        ? onVote(selectedOption)
-                        : ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            backgroundColor: Colors.white70,
-                            content: Text("Please choose option to vote",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .displaySmall!
-                                    .copyWith(color: Colors.red))));
-                  },
-                  child: Text("Vote",
-                      style: Theme.of(context).textTheme.displayMedium)),
-            ),
           ],
         ),
       ),

@@ -11,10 +11,10 @@ class AppRoutes {
   static const createpolls = '/createpolls';
 
   static Map<String, WidgetBuilder> routes = {
-    login: (context) => LoginScreen(),
-    signup: (context) => SignUpScreen(),
+    login: (context) => const LoginScreen(),
+    signup: (context) => const SignUpScreen(),
     home: (context) => const HomeScreen(),
-    createpolls: (context) => CreatePollScreen(),
+    createpolls: (context) => const CreatePollScreen(),
   };
   // static final router = GoRouter(routes: [
   //   GoRoute(

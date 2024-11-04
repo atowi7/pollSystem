@@ -24,11 +24,22 @@ class PollModel {
     };
   }
 
-  factory PollModel.fromSnapshot(DocumentSnapshot snapshot) {
-    var data = snapshot.data() as Map<String, dynamic>;
+  // factory PollModel.fromSnapshot(DocumentSnapshot snapshot) {
+  //   var data = snapshot.data() as Map<String, dynamic>;
+
+  //   return PollModel(
+  //     id: snapshot.id,
+  //     question: data['question'],
+  //     options: List<String>.from(data['options']),
+  //     responses: Map<String, int>.from(data['responses']),
+  //     createdBy: data['createdby'],
+  //   );
+  // }
+  factory PollModel.fromDocument(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
     return PollModel(
-      id: snapshot.id,
+      id: doc.id,
       question: data['question'],
       options: List<String>.from(data['options']),
       responses: Map<String, int>.from(data['responses']),

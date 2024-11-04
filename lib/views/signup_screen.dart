@@ -4,105 +4,105 @@ import 'package:poll_system/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatelessWidget {
-  SignUpScreen({super.key});
-  final TextEditingController _displayNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  const SignUpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final userViewModel = Provider.of<UserProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blue[100],
         body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.lock_outlined,
-                color: Colors.blue,
-                size: 100,
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _displayNameController,
-                decoration: InputDecoration(
-                    hintText: "User Name",
-                    hintStyle: Theme.of(context).textTheme.displayMedium,
-                    labelText: "User Name",
-                    labelStyle: Theme.of(context).textTheme.displayMedium,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    fillColor: Colors.blue.withOpacity(0.4),
-                    filled: true),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                    hintText: "Email",
-                    hintStyle: Theme.of(context).textTheme.displayMedium,
-                    labelText: "Email",
-                    labelStyle: Theme.of(context).textTheme.displayMedium,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    fillColor: Colors.blue.withOpacity(0.4),
-                    filled: true),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _passwordController,
-                decoration: InputDecoration(
-                  hintText: "Password",
-                  hintStyle: Theme.of(context).textTheme.displayMedium,
-                  labelText: "Password",
-                  labelStyle: Theme.of(context).textTheme.displayMedium,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  fillColor: Colors.blue.withOpacity(0.4),
-                  filled: true,
+          child: Form(
+            key: userProvider.signupFormKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.lock_outlined,
+                  color: Colors.blue,
+                  size: 100,
                 ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 8),
-              userViewModel.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ElevatedButton(
-                      onPressed: () async {
-                        bool success = await userViewModel.signup(
-                            _emailController.text,
-                            _passwordController.text,
-                            _displayNameController.text);
-                        if (success) {
-                          if (context.mounted) {
-                            Navigator.of(context)
-                                .pushReplacementNamed(AppRoutes.login);
-                          }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        // shape: const CircleBorder(),
-                        backgroundColor: Colors.blue,
-                        // padding: const EdgeInsets.symmetric(horizontal: 16)
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: userProvider.displayNameController,
+                  validator: (value) => userProvider.validateDisplayName(value),
+                  decoration: InputDecoration(
+                      hintText: "User Name",
+                      hintStyle: Theme.of(context).textTheme.displayMedium,
+                      labelText: "User Name",
+                      labelStyle: Theme.of(context).textTheme.displayMedium,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
                       ),
-                      child: Text(
-                        "SignUp",
-                        style: Theme.of(context).textTheme.displayMedium,
+                      fillColor: Colors.blue.withOpacity(0.4),
+                      filled: true),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: userProvider.emailController,
+                  validator: (value) => userProvider.validateEmail(value),
+                  decoration: InputDecoration(
+                      hintText: "Email",
+                      hintStyle: Theme.of(context).textTheme.displayMedium,
+                      labelText: "Email",
+                      labelStyle: Theme.of(context).textTheme.displayMedium,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
                       ),
+                      fillColor: Colors.blue.withOpacity(0.4),
+                      filled: true),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: userProvider.passwordController,
+                  validator: (value) => userProvider.validatePassword(value),
+                  decoration: InputDecoration(
+                    hintText: "Password",
+                    hintStyle: Theme.of(context).textTheme.displayMedium,
+                    labelText: "Password",
+                    labelStyle: Theme.of(context).textTheme.displayMedium,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
                     ),
-              TextButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(context, AppRoutes.login);
-                  },
-                  child: Text("Already have an account? Login",
-                      style: Theme.of(context).textTheme.displaySmall))
-            ],
+                    fillColor: Colors.blue.withOpacity(0.4),
+                    filled: true,
+                  ),
+                  obscureText: true,
+                ),
+                const SizedBox(height: 8),
+                userProvider.isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ElevatedButton(
+                        onPressed: () async {
+                          await userProvider.signup(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          // shape: const CircleBorder(),
+                          backgroundColor: Colors.blue,
+                          // padding: const EdgeInsets.symmetric(horizontal: 16)
+                        ),
+                        child: Text(
+                          "SignUp",
+                          style: Theme.of(context).textTheme.displayMedium,
+                        ),
+                      ),
+                // if (userProvider.errorMessage != null)
+                //   Text(userProvider.errorMessage!,
+                //       style: Theme.of(context).textTheme.displaySmall!.copyWith(
+                //           fontSize: 12,
+                //           fontWeight: FontWeight.w500,
+                //           color: Colors.red)),
+                TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, AppRoutes.login);
+                    },
+                    child: Text("Already have an account? Login",
+                        style: Theme.of(context).textTheme.displaySmall))
+              ],
+            ),
           ),
         ),
       ),
